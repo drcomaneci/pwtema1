@@ -36,6 +36,13 @@ class HWElement < OpenStruct
 		end
 	end
 
+	def verifyr(browser)
+		verify(browser) #verify current element
+		subelements.each{ |sel|
+			sel.verifyr(browser)
+		}
+	end
+
 	def verify(browser)
 		raise 'Each element should implement the verify function'
 	end
@@ -100,6 +107,9 @@ class HTMLPage < HWElement
 end
 
 class Div < HWElement
+	def verify(browser)
+	end
+
 	def generate
 		[
 			"ID : #{id}"
@@ -115,6 +125,9 @@ class Div < HWElement
 end
 
 class ArticleDate < HWElement
+	def verify(browser)
+	end
+
 	def generate
 		[
 			"ID : #{id}",
@@ -131,6 +144,8 @@ class ArticleDate < HWElement
 end
 
 class Text < HWElement
+	def verify(browser)
+	end
 	def generate
 		[
 			"Numar de cuvinte: #{num_words}",
@@ -153,6 +168,8 @@ class Text < HWElement
 end
 
 class Image < HWElement
+	def verify(browser)
+	end
 	def image_type
 		$type = $prng.rand(1..3)
 		case $type
@@ -189,6 +206,9 @@ class Categorie < Div
 		cats[cat]
 	end
 
+	def verify(browser)
+	end
+
 	def generate
 		[
 			"ID : #{id}",
@@ -205,6 +225,10 @@ class Categorie < Div
 end
 
 class User < Div
+	def verify(browser)
+		super(browser)
+	end
+
 	def generate
 		[
 			"ID: #{id}",
@@ -221,6 +245,10 @@ class User < Div
 end
 
 class Title < Div
+	def verify(browser)
+		super(browser)
+	end
+
 	def generate
 		[
 			"ID: #{id}",
@@ -237,6 +265,9 @@ class Title < Div
 end
 
 class Video < HWElement
+	def verify(browser)
+	end
+
 	def generate_sources
 		$tip = $prng.rand(1..2)
 		case $tip
@@ -262,6 +293,9 @@ class Video < HWElement
 end
 
 class ArticleTable < HWElement
+	def verify(browser)
+		
+	end
 	def subelements
 		[
 			Text.new
@@ -287,6 +321,10 @@ class ArticleTable < HWElement
 end
 
 class TextArticle < Div
+	def verify(browser)
+		
+	end
+
 	def subelements
 		els = []
 		els << Title.new
@@ -305,6 +343,10 @@ class TextArticle < Div
 end
 
 class Link < HWElement
+	def verify(browser)
+
+	end
+
 	def initialize(dest)
 		super(properties.merge({:destination => dest} ))
 	end
@@ -325,6 +367,10 @@ class Link < HWElement
 end
 
 class NavigationPane < HWElement
+	def verify(browser)
+		
+	end	
+
 	def subelements
 		[
 			Link.new("index.html"),
@@ -373,6 +419,9 @@ class MainPage < HTMLPage
 end
 
 class UserInput < HWElement
+	def verify(browser)
+	end
+
 	def generate
 		[
 			"Nume camp: #{field_name}",
@@ -391,6 +440,8 @@ class UserInput < HWElement
 end
 
 class PasswordInput < HWElement
+	def verify(browser)
+	end
 	def generate
 		[
 			"Nume camp: #{field_name}",
@@ -407,6 +458,8 @@ class PasswordInput < HWElement
 end
 
 class SubmitButton < HWElement
+	def verify(browser)
+	end
 	def generate
 		[
 			"Text button login: #{button_text}"
@@ -421,6 +474,8 @@ class SubmitButton < HWElement
 end
 
 class LoginForm < HWElement
+	def verify(browser)
+	end
 	def subelements
 		[
 			UserInput.new,
@@ -474,6 +529,10 @@ class LoginPage < HTMLPage
 end
 
 class SearchField < HWElement
+	
+	def verify(browser)
+	end
+
 	def generate
 		[
 			"Nume camp: #{field_name}",
@@ -493,6 +552,9 @@ class SearchField < HWElement
 end
 
 class SearchSubmit < HWElement
+	def verify(browser)
+	end
+
 	def generate
 		[
 			"Text buton: #{button_text}"
@@ -508,6 +570,8 @@ class SearchSubmit < HWElement
 end
 
 class SearchForm < HWElement
+	def verify(browser)
+	end
 	def subelements
 		[
 			SearchField.new,

@@ -27,7 +27,7 @@ if (ARGV.size == 2 && ARGV[1]=="-t")
 	b = Watir::Browser.new :chrome
 	$elemobjs.each{ |el|
 		begin
-			el.verify(b)
+			el.verifyr(b)
 		rescue Exception => e
 			puts e.message
 			puts e.backtrace.inspect
