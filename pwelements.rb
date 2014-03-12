@@ -37,9 +37,16 @@ class HWElement < OpenStruct
 	end
 
 	def verifyr(browser)
-		verify(browser) #verify current element
+		nb = verify(browser) #verify current element
+
+		if nb.respond_to?(:browser)
+			brow = nb
+		else
+			brow = browser
+		end
+
 		subelements.each{ |sel|
-			sel.verifyr(browser)
+			sel.verifyr(brow)
 		}
 	end
 
