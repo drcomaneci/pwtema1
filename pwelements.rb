@@ -114,7 +114,10 @@ class HTMLPage < HWElement
 end
 
 class Div < HWElement
-	def verify(browser)
+	def verify(b)
+		assert_score("Verificare existenta div #{id}", "OK", "Not OK") {
+			b.div(:id => id) != nil
+		}
 	end
 
 	def generate
