@@ -34,6 +34,7 @@ class HWElement < OpenStruct
 		else
 			puts "#{$attempt}. [#{msg}] Failed : #{msg_fail}"
 		end
+		pass
 	end
 
 	def verifyr(browser)
@@ -45,7 +46,7 @@ class HWElement < OpenStruct
 			brow = browser
 		end
 
-		subelements.each{ |sel|
+		@saved_subelements.each{ |sel|
 			sel.verifyr(brow)
 		}
 	end
@@ -65,7 +66,8 @@ class HWElement < OpenStruct
 	end
 	def generate_description(level = 0)
 		tabs = gen_tabs(level)
-		subelem_gen = subelements.map{|elem| elem.generate_description(level+1)}.join("\n")
+		@saved_subelements = subelements
+		subelem_gen = @saved_subelements.map{|elem| elem.generate_description(level+1)}.join("\n")
 		props = tabs + generate.join("\n" + tabs) + "\n"
 		description = "#{tabs}#{name}: \n#{tabs}Acest element va avea urmatoarele proprietati:\n#{props}"
 		description += "#{tabs}si urmatoarele subelemente: \n" + subelem_gen if subelements.size > 0
@@ -116,7 +118,7 @@ end
 class Div < HWElement
 	def verify(b)
 		assert_score("Verificare existenta div #{id}", "OK", "Not OK") {
-			b.div(:id => id) != nil
+			b.div(:id => id).exists?
 		}
 	end
 
@@ -216,7 +218,10 @@ class Categorie < Div
 		cats[cat]
 	end
 
-	def verify(browser)
+	def verify(b)
+		super(b)
+		cat = b.div(:id => id).text
+		assert_score("Verificare Categorie", "OK", "Categorie incorecta #{cat}, ar fi trebuit #{category}") { cat.include?(category) }
 	end
 
 	def generate
@@ -235,8 +240,10 @@ class Categorie < Div
 end
 
 class User < Div
-	def verify(browser)
-		super(browser)
+	def verify(b)
+		super(b)
+		user = b.div(:id => id).text
+		assert_score("Verificare User", "OK", "User-ul #{user} este incorect, se astepta #{username}") { user.include?(username) }
 	end
 
 	def generate
@@ -255,8 +262,10 @@ class User < Div
 end
 
 class Title < Div
-	def verify(browser)
-		super(browser)
+	def verify(b)
+		super(b)
+		titlu = b.div(:id=>id).text
+		assert_score("Verificare Titlu", "OK", "Se astepta #{title}") {title.include?(titlu)}
 	end
 
 	def generate
@@ -331,10 +340,6 @@ class ArticleTable < HWElement
 end
 
 class TextArticle < Div
-	def verify(browser)
-		
-	end
-
 	def subelements
 		els = []
 		els << Title.new
@@ -353,8 +358,10 @@ class TextArticle < Div
 end
 
 class Link < HWElement
-	def verify(browser)
-
+	def verify(b)
+		link = b.a(:href=>destination)
+		assert_score("Existenta link catre #{destination}", "OK", "Nu exista un link catre #{destination}") { link.exists? }
+		assert_score("Verificare Text Link", "OK", "Text link incorect, se astepta #{text_link}") { link.text.include?(text_link) }
 	end
 
 	def initialize(dest)
@@ -377,8 +384,10 @@ class Link < HWElement
 end
 
 class NavigationPane < HWElement
-	def verify(browser)
-		
+	def verify(b)
+		nav = b.nav(:id => id)
+		assert_score("Existenta nav", "OK", "Tag-ul nav cu id #{id} nu este prezent") { nav.exists? }
+		nav #only search the nav element for the links
 	end	
 
 	def subelements
@@ -408,13 +417,17 @@ end
 
 class MainPage < HTMLPage
 	def subelements
-		els = []
-		els << NavigationPane.new
+		#if defined?(@els)
+		#	@els
+		#else
+		@els = []
+		@els << NavigationPane.new
 		num_articles = $prng.rand(2..4)
 		num_articles.times{
-			els << TextArticle.new
+			@els << TextArticle.new
 		}
-		els
+		@els
+		#end
 	end
 
 	def properties

@@ -6,8 +6,8 @@ def generate_hw(student_name)
 	$elemobjs = []
 	desc = $pwelements.map{ |element|
 		elemobj = element.new
-		$elemobjs << elemobj
-		if (elemobj.mandatory || $prng.rand(1..10000)%2 == 0)
+		if (elemobj.mandatory || $prng.rand(1..10000)%2 == 0)	
+			$elemobjs << elemobj
 			elemobj.generate_description
 		else
 			""
