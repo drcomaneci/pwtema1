@@ -1,4 +1,5 @@
 require 'ostruct'
+require 'pp'
 $attempt = 0
 $passed = 0
 class HWElement < OpenStruct
@@ -15,9 +16,19 @@ class HWElement < OpenStruct
 		raise 'Each element should implement the generate function.'
 	end
 
-	def assert_score(cond, msg, msg_pass, msg_fail)
+	def assert_score(msg, msg_pass, msg_fail, &cond)
 		$attempt = $attempt + 1
-		if cond == true
+		pass = false
+
+		begin
+			pass = cond.call
+		rescue Exception => e
+			puts e.message
+			puts e.backtrace.inspect
+			pass = false
+		end
+
+		if pass == true
 			puts "#{$attempt}. [#{msg}] Passed : #{msg_pass}"
 			$passed = $passed + 1
 		else
@@ -58,8 +69,25 @@ end
 
 class HTMLPage < HWElement
 	def verify(b)
-		b.goto "file://#{File.dirname(__FILE__)}/#{filename}"
-		assert_score b.title.include?(title), "Verificare Titlul Pagina", "Titlul este corect", "Titlul este incorect, trebuie sa contina #{title}"
+		puts "Se verifica pagina #{filename}"
+		file_path = "#{File.dirname(__FILE__)}/#{filename}"
+		
+		assert_score("Verificare Existenta Pagina", "Pagina este prezenta", "Pagina #{file_path} nu exista pe disk") { File.exists?(file_path) }
+		
+		b.goto "file://#{file_path}"
+		
+		assert_score("Verificare Titlul Pagina", "Titlul este corect", "Titlul este incorect, trebuie sa contina #{title}") { b.title.include?(title) }
+		
+		keywords = b.meta(:name=>"keywords")
+		assert_score("Verificare Existenta Meta Keywords", "Tag-ul meta exista", "Nu exista nici un tag meta cu name=\"keywords\"") { keywords!=null }
+		
+		keywords_value = keywords.attribute_value("content")
+		assert_score("Verificare existenta attribut content pentru tagul meta", "OK", "Not OK") { keywords_value!=nil }
+
+		meta_vals = meta_keywords.split(",").map{|k| k.strip }
+		meta_vals.each{ |v|
+			assert_score("Verificare keyword #{v}", "OK", "Keyword-ul #{v} nu e prezent.") { keywords_value.include?(v) }
+		}
 	end
 
 	def generate
