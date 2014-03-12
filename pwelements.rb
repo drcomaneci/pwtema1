@@ -38,17 +38,21 @@ class HWElement < OpenStruct
 	end
 
 	def verifyr(browser)
-		nb = verify(browser) #verify current element
+		begin 
+			nb = verify(browser) #verify current element
 
-		if nb.respond_to?(:browser)
-			brow = nb
-		else
-			brow = browser
+			if nb.respond_to?(:browser)
+				brow = nb
+			else
+				brow = browser
+			end
+
+			@saved_subelements.each{ |sel|
+				sel.verifyr(brow)
+			}
+		rescue Exception => e
+			puts "Nu s-a putut verifica elementul #{name} datorita urmatoarei exceptii: #{e.message}."
 		end
-
-		@saved_subelements.each{ |sel|
-			sel.verifyr(brow)
-		}
 	end
 
 	def verify(browser)
@@ -481,7 +485,10 @@ class PasswordInput < HWElement
 end
 
 class SubmitButton < HWElement
-	def verify(browser)
+	def verify(b)
+		sb = b.input(:type => "submit")
+		assert_score("Verificare Prezenta Submit", "OK", "Nu a fost gasit nici un buton de submit") { sb.exists? }
+		assert_score("Verificare Text Submit", "OK", "Se astepta ca butonul de submit sa aiba textul #{button_text}") { sb.value.include?(button_text) }
 	end
 	def generate
 		[
@@ -497,7 +504,11 @@ class SubmitButton < HWElement
 end
 
 class LoginForm < HWElement
-	def verify(browser)
+	def verify(b)
+		form = b.form(:action => pagina_destinatie)
+		assert_score("Verificare existenta formular", "OK", "Nu exista nici un element form care sa se submita catre #{pagina_destinatie}") { form.exists? }
+		assert_score("Verificare metoda de submit formular", "OK", "Metoda incorecta, se astepta #{form_method}") { form.attribute_value("method").upcase == form_method }
+		form
 	end
 	def subelements
 		[
