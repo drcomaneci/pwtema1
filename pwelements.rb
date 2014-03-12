@@ -1,4 +1,6 @@
 require 'ostruct'
+$attempt = 0
+$passed = 0
 class HWElement < OpenStruct
 	def subelements
 		[]
@@ -11,6 +13,16 @@ class HWElement < OpenStruct
 
 	def generate
 		raise 'Each element should implement the generate function.'
+	end
+
+	def assert_score(cond, msg, msg_pass, msg_fail)
+		$attempt = $attempt + 1
+		if cond == true
+			puts "#{$attempt}. [#{msg}] Passed : #{msg_pass}"
+			$passed = $passed + 1
+		else
+			puts "#{$attempt}. [#{msg}] Failed : #{msg_fail}"
+		end
 	end
 
 	def verify(browser)
@@ -45,6 +57,11 @@ class HWElement < OpenStruct
 end
 
 class HTMLPage < HWElement
+	def verify(b)
+		b.goto "file://#{File.dirname(__FILE__)}/#{filename}"
+		assert_score b.title.include?(title), "Verificare Titlul Pagina", "Titlul este corect", "Titlul este incorect, trebuie sa contina #{title}"
+	end
+
 	def generate
 		[
 			"Numele fisierului HTML: #{filename}",

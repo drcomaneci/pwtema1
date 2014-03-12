@@ -35,6 +35,8 @@ if (ARGV.size == 2 && ARGV[1]=="-t")
 		end
 	}
 	b.close
+	score = $passed.to_f/$attempt.to_f
+	puts "Scor final #{$passed} / #{$attempt} = #{score} * 0.6 = #{score * 0.6}"
 else
 	puts desc
 end
