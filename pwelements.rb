@@ -516,7 +516,18 @@ class UserInput < HWElement
 end
 
 class PasswordInput < HWElement
-	def verify(browser)
+	def verify(b)
+		el = b.input(:type => "password")
+		assert_score("Existenta caseta de password", "OK", "Nu exista nici un astfel de element") {
+			el.exists?
+		}
+		assert_score("Verificare nume camp password", "OK", "Nume incorect #{el.attribute_value("name")}, se astepta #{field_name}"){
+			el.attribute_value("name") == field_name
+		}
+		assert_score("Verificare lungime maxima camp text", "OK", "Lungime incorecta #{el.attribute_value("maxlength")}, se astepta #{maxlength}"){
+			el.attribute_value("maxlength").to_i == maxlength
+		}
+
 	end
 	def generate
 		[
@@ -611,9 +622,22 @@ class LoginPage < HTMLPage
 	end
 end
 
-class SearchField < HWElement
-	
-	def verify(browser)
+class SearchField < HWElement	
+	def verify(b)
+		el = b.input(:type => "text")
+		assert_score("Existenta caseta de input text", "OK", "Nu exista nici un astfel de element") {
+			el.exists?
+		}
+		assert_score("Verificare nume camp text", "OK", "Nume incorect #{el.attribute_value("name")}, se astepta #{field_name}"){
+			el.attribute_value("name") == field_name
+		}
+		assert_score("Verificare lungime maxima camp text", "OK", "Lungime incorecta #{el.attribute_value("maxlength")}, se astepta #{maxlength}"){
+			el.attribute_value("maxlength").to_i == maxlength
+		}
+		assert_score("Verificare text initial pentru camp", "OK", "Text initial incorect #{el.attribute_value("value")}, se astepta #{initial_text}"){
+			el.attribute_value("value") == initial_text
+		}
+
 	end
 
 	def generate
@@ -635,7 +659,10 @@ class SearchField < HWElement
 end
 
 class SearchSubmit < HWElement
-	def verify(browser)
+	def verify(b)
+		sb = b.input(:type => "submit")
+		assert_score("Verificare Prezenta Submit", "OK", "Nu a fost gasit nici un buton de submit") { sb.exists? }
+		assert_score("Verificare Text Submit", "OK", "Se astepta ca butonul de submit sa aiba textul #{button_text}") { sb.value.include?(button_text) }
 	end
 
 	def generate
@@ -653,8 +680,14 @@ class SearchSubmit < HWElement
 end
 
 class SearchForm < HWElement
-	def verify(browser)
+	
+	def verify(b)
+		form = b.form(:action => pagina_destinatie)
+		assert_score("Verificare existenta formular", "OK", "Nu exista nici un element form care sa se submita catre #{pagina_destinatie}") { form.exists? }
+		assert_score("Verificare metoda de submit formular", "OK", "Metoda incorecta, se astepta #{form_method}") { form.attribute_value("method").upcase == form_method }
+		form
 	end
+
 	def subelements
 		[
 			SearchField.new,
