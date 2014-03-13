@@ -92,6 +92,17 @@ class HTMLPage < HWElement
 		puts "Se verifica pagina #{filename}"
 		file_path = "#{File.dirname(__FILE__)}/#{filename}"
 		
+		if (filename == "index.html") 
+			puts "Se elimina tag-urile <blockquote> pentru a se putea incarca corect pagina in browser."
+			contents = (f = File.new(file_path)).read
+			f.close
+			contents.gsub!(/<blockquote.*?>/,"")
+			contents.gsub!("</blockquote>", "")
+			f = File.new(file_path, "w")
+			f.write(contents)
+			f.close
+		end
+
 		assert_score("Verificare Existenta Pagina", "Pagina este prezenta", "Pagina #{file_path} nu exista pe disk") { File.exists?(file_path) }
 		
 		b.goto "file://#{file_path}"
