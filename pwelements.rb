@@ -481,7 +481,21 @@ class MainPage < HTMLPage
 end
 
 class UserInput < HWElement
-	def verify(browser)
+	def verify(b)
+		el = b.input(:type => "text")
+		assert_score("Existenta caseta de input text", "OK", "Nu exista nici un astfel de element") {
+			el.exists?
+		}
+		assert_score("Verificare nume camp text", "OK", "Nume incorect #{el.attribute_value("name")}, se astepta #{field_name}"){
+			el.attribute_value("name") == field_name
+		}
+		assert_score("Verificare lungime maxima camp text", "OK", "Lungime incorecta #{el.attribute_value("maxlength")}, se astepta #{maxlength}"){
+			el.attribute_value("maxlength").to_i == maxlength
+		}
+		assert_score("Verificare text initial pentru camp", "OK", "Text initial incorect #{el.attribute_value("value")}, se astepta #{initial_text}"){
+			el.attribute_value("value") == initial_text
+		}
+
 	end
 
 	def generate
