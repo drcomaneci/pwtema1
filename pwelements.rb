@@ -197,8 +197,30 @@ class Text < HWElement
 end
 
 class Image < HWElement
-	def verify(browser)
+	def img_ext(src)
+		s = src.split(".")
+		s[s.size-1].upcase
 	end
+
+	def verify(b)
+		loaded = false
+		assert_score("Verificare existenta imagine de tip #{img_type} cu dimensiunile #{width}x#{height} si text alternativ #{alt_text}", "OK", "Not OK") {
+			exists = false
+			b.imgs.each { |img|
+				ext=img_ext(img.attribute_value("src"))
+				w = img.attribute_value("width").to_i
+				h = img.attribute_value("height").to_i
+				alt = img.attribute_value("alt")
+				if (ext == img_type && w == width && h == height && alt == alt_text)
+					exists = true
+					loaded = img.loaded?
+				end
+			}
+			exists
+		}
+		assert_score("Imagine a fost incarcata corect", "OK", "Not OK") { loaded == true }
+	end
+
 	def image_type
 		$type = $prng.rand(1..3)
 		case $type
