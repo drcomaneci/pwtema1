@@ -370,8 +370,18 @@ class Video < HWElement
 end
 
 class ArticleTable < HWElement
-	def verify(browser)
-		
+	def verify(b)
+		el = b.table
+		assert_score("Verificare existenta tabel", "OK", "Not OK") {
+			el.exists?
+		}
+		assert_score("Verificare numar de randuri", "OK", "Not OK #{el.rows.size} != #{numar_randuri}"){
+			el.rows.size == numar_randuri
+		}
+		assert_score("Verificare numar de coloane", "OK", "Not OK #{el[0].elements.size} != #{numar_coloane}"){
+			el[0].elements.size == numar_coloane
+		}
+		el[rand_text - 1].elements[coloana_text - 1]
 	end
 	def subelements
 		[
