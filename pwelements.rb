@@ -124,6 +124,7 @@ class Div < HWElement
 		assert_score("Verificare existenta div #{id}", "OK", "Not OK") {
 			b.div(:id => id).exists?
 		}
+		b.div(:id => id)
 	end
 
 	def generate
@@ -141,7 +142,9 @@ class Div < HWElement
 end
 
 class ArticleDate < HWElement
-	def verify(browser)
+	def verify(b)
+		assert_score("Verificare existenta div data", "OK", "Nu exista div-ul pentru data cu id-ul #{id}") { b.div(:id => id).exists? }
+		assert_score("Verificare Data", "Data este corecta", "Data incorecta, se astepta #{data.to_s}") { b.div(:id => id).text.include?(date.to_s) }
 	end
 
 	def generate
@@ -160,7 +163,17 @@ class ArticleDate < HWElement
 end
 
 class Text < HWElement
-	def verify(browser)
+	def count_words(text)
+		text.gsub(/[.,;:'"\(\)]/," ").gsub(/\s+/," ").split(" ").size
+	end
+
+	def verify(b)
+		assert_score("Verificare existenta element paragraf", "OK", "Nu exista nici un paragraf") { b.p.exists? }
+		assert_score("Verificare tag cite pentru #{cite ? 'prezenta' : 'absenta'}", "OK", "Not OK") { b.p.cite.exists? == cite }
+		assert_score("Verificare numar de cuvinte", "OK", "Numarul de cuvinte identificate(#{count_words(b.p.text)} nu este egal cu cel din cerinta (#{num_words})") { num_words == count_words(b.p.text) }
+		assert_score("Verificare tag sup pentru #{sup ? 'prezenta' : 'absenta'}", "OK", "Not OK") { b.p.sup.exists? == sup }
+		assert_score("Verificare tag sub pentru #{sub ? 'prezenta' : 'absenta'}", "OK", "Not OK") { b.p.sub.exists? == sub }
+		assert_score("Punctare cerinta invalida blockquote", "OK","") { true }
 	end
 	def generate
 		[
