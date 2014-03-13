@@ -323,7 +323,26 @@ class Title < Div
 end
 
 class Video < HWElement
-	def verify(browser)
+	def vid_ext(src)
+		s = src.split(".")
+		s[s.size-1].upcase
+	end
+
+	def verify(b)
+		el = b.video
+		assert_score("Verificare existenta Video", "OK", "Not OK") {
+			el.exists?
+		}
+		assert_score("Verificare tip video", "OK", "Not OK"){
+			(vid_ext(el.source.attribute_value("src")) == sources[:format_video]) && 
+			(el.source.attribute_value("type") == "video/#{sources[:format_video].downcase}")
+		}
+		assert_score("Verificare dimensiuni video", "OK", "Not OK") {
+			w = el.attribute_value("width")
+			h = el.attribute_value("height")
+			wh = "#{w}x#{h}"
+			wh == sources[:dimensiuni]
+		}
 	end
 
 	def generate_sources
