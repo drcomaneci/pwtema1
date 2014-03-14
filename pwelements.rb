@@ -389,8 +389,8 @@ class ArticleTable < HWElement
 		assert_score("Verificare numar de randuri", "OK", "Not OK #{el.rows.size} != #{numar_randuri}"){
 			el.rows.size == numar_randuri
 		}
-		assert_score("Verificare numar de coloane", "OK", "Not OK #{el[0].elements.size} != #{numar_coloane}"){
-			el[0].elements.size == numar_coloane
+		assert_score("Verificare numar de coloane", "OK", "Not OK #{el.row.cells.size} != #{numar_coloane}"){
+			el.row.cells.size == numar_coloane
 		}
 		el[rand_text - 1].elements[coloana_text - 1]
 	end
